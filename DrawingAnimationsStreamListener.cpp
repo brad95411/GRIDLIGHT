@@ -227,6 +227,10 @@ void DrawingAnimationsStreamListener::processEvent(StreamEvent* event)
               color1, color2, atoi(event->dataArray[10]));
             animations[nextPos]->start();
           }
+          else if(strcmp_P(event->dataArray[2], PSTR("TEXT")) == 0)
+          {
+            
+          }
         }
       }
     }
@@ -274,5 +278,37 @@ uint16_t DrawingAnimationsStreamListener::getNextAniPos()
   }
 
   return 65535;
+}
+
+int8_t DrawingAnimationsStreamListener::getAvailableScrollingLayerID()
+{
+  for(uint16_t i = 0; i < MAXSCROLLINGLAYERS; i++)
+  {
+    if(scrollingLayers[i] != NULL)
+    {
+      if(scrollingLayers[i]->getStatus() == 0)
+      {
+        scrollingLayerAvailable[i] = true;
+      }
+    }
+  }
+
+  for(uint16_t i = 0; i < MAXSCROLLINGLAYERS; i++)
+  {
+    if(scrollingLayerAvailable[i])
+    {
+      if(scrollingLayers[i] == NULL)
+      {
+        SMARTMATRIX_ALLOCATE_SCROLLING_LAYER(temporaryLayer, kMatrixWidth, kMatrixHeight, COLOR_DEPTH, kScrollingLayerOptions);
+
+        scrollingLayers[i] = &temporaryLayer;
+      }
+
+      scrollingLayerAvailable[i] = false;
+      return i;
+    }
+  }
+
+  return -1;
 }
 
