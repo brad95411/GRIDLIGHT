@@ -21,8 +21,10 @@ class DrawingAnimationsStreamListener : public IStreamListener
   public:
     DrawingAnimationsStreamListener(Print* _stream, SMLayerBackground<rgb24, 0>* _layer, 
       uint16_t _maxAnimations) : maxAnimations(_maxAnimations), stream(_stream), 
-      layer(_layer), animations(new Animation2D*[_maxAnimations]) 
-      {for(uint16_t i = 0; i < _maxAnimations; i++) {animations[i] = NULL;}}
+      layer(_layer), scrollingLayers(new SMLayerScrolling<rgb24, 0>*[MAXSCROLLINGLAYERS]),
+      animations(new Animation2D*[_maxAnimations]) 
+      {for(uint16_t i = 0; i < _maxAnimations; i++) {animations[i] = NULL;}
+       for(uint16_t i = 0; i < MAXSCROLLINGLAYERS; i++) {scrollingLayers[i] = NULL;}}
     ~DrawingAnimationsStreamListener() {}
 
     void processEvent(StreamEvent* event);
@@ -38,6 +40,8 @@ class DrawingAnimationsStreamListener : public IStreamListener
       stream;
     SMLayerBackground<rgb24, 0>*
       layer;
+    SMLayerScrolling<rgb24, 0>**
+      scrollingLayers;
     Animation2D**
       animations;
 };

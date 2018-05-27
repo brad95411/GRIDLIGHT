@@ -12,6 +12,9 @@
 #define MAXSTRINGSINSPLIT 25
 #define INBOUNDSTREAMBUFFERSIZE 300
 #define MAXLISTENERS 10
+#define DEFAULTROTATION rotation180
+#define TOTALMAXANIMATIONS 10
+#define MAXSCROLLINGLAYERS 3
 #define COLOR_DEPTH 24                  // known working: 24, 48 - If the sketch uses type `rgb24` directly, COLOR_DEPTH must be 24
 
 const uint8_t kMatrixWidth = 96;        // known working: 32, 64, 96, 128

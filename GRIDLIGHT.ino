@@ -16,11 +16,11 @@ void setup() {
   matrix.begin();
   matrix.setBrightness(255);
   backgroundLayer.enableColorCorrection(true);
-  backgroundLayer.setRotation(rotation180);
+  backgroundLayer.setRotation(DEFAULTROTATION);
   
   processor = new StreamProcessor(&SERIALPORT);
 
-  daListener = new DrawingAnimationsStreamListener(&SERIALPORT, &backgroundLayer, 10);
+  daListener = new DrawingAnimationsStreamListener(&SERIALPORT, &backgroundLayer, TOTALMAXANIMATIONS);
 
   if(processor->addListener(daListener) && GRIDLIGHTDEBUG)
   {
