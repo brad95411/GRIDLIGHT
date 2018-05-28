@@ -229,7 +229,85 @@ void DrawingAnimationsStreamListener::processEvent(StreamEvent* event)
           }
           else if(strcmp_P(event->dataArray[2], PSTR("TEXT")) == 0)
           {
-            
+            if(event->arrayLength == 4)
+            {
+              if(strcmp_P(event->dataArray[3], PSTR("SMO")) == 0)
+              {
+                for(uint8_t i = 0; i < ScrollingText2D::getTotalScrollModeTypes(); i++)
+                {
+                  stream->print(F("BACK:NEW:TEXT:SMO:PART:"));
+                  stream->print(ScrollingText2D::scrollModeOrdinalToHumanReadableName(i));
+                  stream->print(F("~"));
+                }
+
+                stream->print(F("BACK:NEW:TEXT:SMO:DONE~"));
+              }
+              else if(strcmp_P(event->dataArray[3], PSTR("FCO")) == 0)
+              {
+                for(uint8_t i = 0; i < ScrollingText2D::getTotalFontChoiceTypes(); i++)
+                {
+                  stream->print(F("BACK:NEW:TEXT:FCO:PART:"));
+                  stream->print(ScrollingText2D::fontChoiceOrdinalToHumanReadableName(i));
+                  stream->print(F("~"));
+                }
+
+                stream->print(F("BACK:NEW:TEXT:FCO:DONE~"));
+              }
+            }
+            else
+            {
+              int8_t nextAnimationID = getAvailableScrollingLayerID();
+
+              if(nextAnimationID == -1)
+              {
+                stream->print(F("BACK:NEW:TEXT:NO AVAILABLE SCROLLING TEXT LAYERS AT THIS TIME"));
+              }
+              else
+              {
+                if(strcmp_P(event->dataArray[3], PSTR("SST")) == 0)
+                {
+                  rgb24 textColor;
+
+                  LEDUtils::createColor(atoi(event->dataArray[5]), &textColor);
+                  
+                  animations[nextPos] = new ScrollingText2D(*scrollingLayers[nextAnimationID], 
+                  new SemiStaticTextProvider(event->dataArray[11]), 
+                  ScrollingText2D::ordinalToScrollMode(atoi(event->dataArray[4])),
+                  textColor, ScrollingText2D::ordinalToFontChoice(atoi(event->dataArray[6])),
+                  atoi(event->dataArray[7]), atoi(event->dataArray[8]),
+                  atoi(event->dataArray[9]), atoi(event->dataArray[10]));
+                  animations[nextPos]->start();
+                }
+                else if(strcmp_P(event->dataArray[3], PSTR("TIM")) == 0)
+                {
+                  if(event->arrayLength == 4)
+                  {
+                    for(uint8_t i = 0; i < TimeTextProvider::getTotalDateTimeTypes(); i++)
+                    {
+                      stream->print(F("BACK:NEW:TEXT:TIM:PART:"));
+                      stream->print(TimeTextProvider::dateTimeTypeOrdinalToHumanReadableName(i));
+                      stream->print(F("~"));
+                    }
+
+                    stream->print(F("BACK:NEW:TEXT:TIM:DONE~"));
+                  }
+                  else
+                  {
+                    rgb24 textColor;
+
+                    LEDUtils::createColor(atoi(event->dataArray[5]), &textColor);
+                  
+                    animations[nextPos] = new ScrollingText2D(*scrollingLayers[nextAnimationID], 
+                    new TimeTextProvider(TimeTextProvider::ordinalToDateTimeType(atoi(event->dataArray[11]))), 
+                    ScrollingText2D::ordinalToScrollMode(atoi(event->dataArray[4])),
+                    textColor, ScrollingText2D::ordinalToFontChoice(atoi(event->dataArray[6])),
+                    atoi(event->dataArray[7]), atoi(event->dataArray[8]),
+                    atoi(event->dataArray[9]), atoi(event->dataArray[10]));
+                    animations[nextPos]->start();
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -300,6 +378,7 @@ int8_t DrawingAnimationsStreamListener::getAvailableScrollingLayerID()
       if(scrollingLayers[i] == NULL)
       {
         SMARTMATRIX_ALLOCATE_SCROLLING_LAYER(temporaryLayer, kMatrixWidth, kMatrixHeight, COLOR_DEPTH, kScrollingLayerOptions);
+        temporaryLayer.setRotation(DEFAULTROTATION);
 
         scrollingLayers[i] = &temporaryLayer;
       }

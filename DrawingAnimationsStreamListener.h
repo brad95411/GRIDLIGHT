@@ -13,6 +13,9 @@
 #include "Ricochet2D.h"
 #include "TripCycling2D.h"
 #include "GlobalSettings.h"
+#include "ScrollingText2D.h"
+#include "SemiStaticTextProvider.h"
+#include "TimeTextProvider.h"
 #include <SmartMatrix3.h>
 #include <Print.h>
 
